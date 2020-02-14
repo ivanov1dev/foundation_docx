@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function foundation_docx_requirements($phase) {
+  $return = [];
+  $t = get_t();
+
+  if ($phase === 'runtime') {
+    $library = libraries_detect('phpdocx');
+    $version = !empty($library['version']) ? $library['version'] : FALSE;
+    $return['phpdocx'] = [
+      'title' => $t('@label library', ['@label' => 'phpdocx']),
+      'value' => $version ?: $t('Not available'),
+      'severity' => $version ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+    ];
+  }
+
+  return $return;
+}

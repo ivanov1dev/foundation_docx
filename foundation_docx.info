@@ -1,0 +1,6 @@
+name = Foundation DocX
+description = Foundation DocX
+core = 7.x
+version = 7.x-1.0
+project = foundation_docx
+project path = sites/all/modules/third

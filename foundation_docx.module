@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * Implements hook_libraries_info().
+ */
+function foundation_docx_libraries_info() {
+  $libraries = [];
+
+  if (($library_path = libraries_get_path('phpdocx'))) {
+    $libraries['phpdocx'] = array(
+      'library path' => $library_path,
+      'name' => 'phpdocx',
+      'vendor url' => 'https://www.phpdocx.com/',
+      'download url' => 'https://www.phpdocx.com/pricing',
+      'version callback' => 'foundation_docx_get_library_version',
+      'version arguments' => array(),
+      'files' => array(
+        'php' => array(
+          'classes/AutoLoader.inc',
+        ),
+      ),
+      'callbacks' => array(
+        'post-load' => array('foundation_docx_libraries_post_load'),
+      ),
+    );
+  }
+
+  return $libraries;
+}
+
+/**
+ * Library info "version callback".
+ *
+ * @param array $info
+ *   Library info.
+ *
+ * @return string|false
+ *   Version number.
+ */
+function foundation_docx_get_library_version(array $info) {
+  static $versions = [];
+
+  $library_path = $info['library path'];
+
+  if (!$library_path) {
+    return FALSE;
+  }
+
+  if (!isset($versions[$library_path])) {
+    $versions[$library_path] = FALSE;
+    if (is_readable("$library_path/Readme.txt")) {
+      $package = file_get_contents("$library_path/Readme.txt");
+      $version = 'Undetect version';
+      $match = [];
+      if (preg_match('/([0-9].{4})/', str_replace("\n", '', $package), $match)) {
+        $version = $match[0];
+      }
+
+      if ($package && $version) {
+        $versions[$library_path] = $version;
+      }
+    }
+  }
+
+  return $versions[$library_path];
+}
+
+/**
+ * @param $library
+ * @param $version_string
+ * @param $version_variant_name
+ *
+ * @see libraries_invoke()
+ */
+function foundation_docx_libraries_post_load($library, $version_string, $version_variant_name) {
+  AutoLoader::load();
+}
